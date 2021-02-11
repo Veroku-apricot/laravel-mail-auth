@@ -3,26 +3,32 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+
+use App\Mail\TestMail;
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function index()
-    {
+    public function sendMail(Request $request) {
+
+      $data = $request -> validate([
+        'mailText' => 'required|min:5'
+      ]);
+
+      Mail::to(Auth::user() -> email)
+          -> send(new TestMail($data['mailText']));
+
+      return redirect() -> back();
+    }
+
+    public function index() {
+
         return view('home');
     }
 }
